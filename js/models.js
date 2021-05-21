@@ -25,7 +25,6 @@ class Story {
 
   getHostName() {
     // UNIMPLEMENTED: complete this function!
-    // return "hostname.com";
     return new URL(this.url).host;
   }
 }
@@ -61,7 +60,7 @@ class StoryList {
     });
 
     // turn plain old story objects from API into instances of Story class
-    const stories = response.data.stories.map((story) => new Story(story));
+    const stories = response.data.stories.map(story => new Story(story));
 
     // build an instance of our own class using the new array of stories
     return new StoryList(stories);
@@ -74,7 +73,8 @@ class StoryList {
    * Returns the new Story instance
    */
 
-  async addStory(user, {title, author, url }) {
+  async addStory(user, {title, author, url}) {
+    // UNIMPLEMENTED: complete this function!
     const APItoken = user.loginToken;
     const httpResponse = await axios({
       method: "POST",
@@ -89,6 +89,23 @@ class StoryList {
     console.log(newStory instanceof Story);
     return newStory;
   }
+
+  async removeStory(user, storyId){
+    await axios({
+      method: "DELETE",
+      url: `${BASE_URL}/stories/${storyId}`,
+      data: {token: user.loginToken}
+    });
+
+    //filters out story from main stories list
+    this.stories = this.stories.filter(story => story.storyId !== storyId);
+
+    //filters out story from own stories
+    user.ownStories = user.ownStories.filter(story => story.storyId !== storyId);
+
+    //filters out story from favorite stories
+    user.favorites = user.favorites.filter(story => story.storyId !== storyId);
+  }
 }
 
 
@@ -102,21 +119,17 @@ class User {
    *   - token
    */
 
-  constructor({
-                username,
-                name,
-                createdAt,
-                favorites = [],
-                ownStories = []
-              },
-              token) {
+  constructor(
+    { username, name, createdAt, favorites = [], ownStories = [] },
+    token
+  ) {
     this.username = username;
     this.name = name;
     this.createdAt = createdAt;
 
     // instantiate Story instances for the user's favorites and ownStories
-    this.favorites = favorites.map(s => new Story(s));
-    this.ownStories = ownStories.map(s => new Story(s));
+    this.favorites = favorites.map((s) => new Story(s));
+    this.ownStories = ownStories.map((s) => new Story(s));
 
     // store the login token on the user so it's easy to find for API calls.
     this.loginToken = token;
@@ -136,7 +149,7 @@ class User {
       data: { user: { username, password, name } },
     });
 
-    let { user } = response.data
+    let { user } = response.data;
 
     return new User(
       {
@@ -144,7 +157,7 @@ class User {
         name: user.name,
         createdAt: user.createdAt,
         favorites: user.favorites,
-        ownStories: user.stories
+        ownStories: user.stories,
       },
       response.data.token
     );
@@ -171,7 +184,7 @@ class User {
         name: user.name,
         createdAt: user.createdAt,
         favorites: user.favorites,
-        ownStories: user.stories
+        ownStories: user.stories,
       },
       response.data.token
     );
@@ -197,7 +210,7 @@ class User {
           name: user.name,
           createdAt: user.createdAt,
           favorites: user.favorites,
-          ownStories: user.stories
+          ownStories: user.stories,
         },
         token
       );
@@ -205,5 +218,32 @@ class User {
       console.error("loginViaStoredCredentials failed", err);
       return null;
     }
+  }
+
+  async addFavorite(story) {
+    this.favorites.unshift(story);
+    await this.addRemoveFavorite("add", story);
+  }
+
+  async removeFavorite(story) {
+    this.favorites = this.favorites.filter((s) => s.storyId !== story.storyId);
+    await this.addRemoveFavorite("remove", story);
+  }
+
+  async addRemoveFavorite(favoriteValue, story){
+    let method = "POST";
+    if(favoriteValue === "remove"){
+      method = "DELETE"
+    }
+    
+    await axios({
+      method: method,
+      url: `${BASE_URL}/users/${this.username}/favorites/${story.storyId}`,
+      data: {token: this.loginToken}
+    });
+  }
+
+  isFavorite(story){
+    return this.favorites.some((s) => s.storyId === story.storyId);
   }
 }

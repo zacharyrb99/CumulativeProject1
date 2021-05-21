@@ -28,7 +28,6 @@
   <link rel="stylesheet" href="css/user.css">
   <link rel="stylesheet" href="css/stories.css">
   <link rel="stylesheet" href="css/nav.css">
-  <link rel="shortcut icon" href="#">
 </head>
 
 <body>
@@ -39,10 +38,10 @@
     <a class="nav-link" href="#" id="nav-all">Hack or Snooze</a>
   </div>
 
-  <div class = "main-nav-links hidden">
-    <a class = "nav-link" href="#" id = "nav-submit-story">Submit</a>
-    <a class = "nav-link" href="#" id = "nav-favorite-stories">Favorites</a>
-    <a class = "nav-link" href="#" id = "nav-my-stories">My Stories</a>
+  <div>
+    <a class="nav-link" href="#" id="nav-submit-story">Submit Story</a>
+    <a class="nav-link" href="#" id="nav-favorites">My Favorites</a>
+    <a class="nav-link" href="#" id="nav-my-stories">My Stories</a>
   </div>
 
   <div class="nav-right">
@@ -54,23 +53,22 @@
 
 <!-- area for stories (all stories, user stories, favorites) -->
 <section class="stories-container container">
-  <!-- newStory form -->
-  <form action ="" class = "hidden" id = "submit-form">
-    <div>
-      <label for = "author">Author</label>
-      <input required id = "author" placeholder = "AUTHOR">
-    </div>
 
+  <form action="" class="hidden" id="submit-form">
     <div>
-      <label for = "title">Story Title</label>
-      <input required id = "title" placeholder = "TITLE">
+      <label for="author">author</label>
+      <input required id="author" required placeholder="AUTHOR">
     </div>
-
     <div>
-      <label for = "url">Story URL</label>
-      <input required type = "url" id = "url" placeholder = "URL">
+      <label for="title">title</label>
+      <input required id="title" required placeholder="TITLE">
     </div>
-    <button type = "submit">SUBMIT</button>
+    <div>
+      <label for="url">url</label>
+      <input required id="url" type="url" placeholder="URL">
+    </div>
+    <button id = "submite" type="submit">SUBMIT</button>
+    <hr>
   </form>
 
   <!-- loading message (removed by JS after stories loaded) -->
@@ -78,6 +76,10 @@
 
   <!-- List of all stories -->
   <ol id="all-stories-list" class="stories-list"></ol>
+
+  <ol id="favorited-stories" class="hidden stories-list"></ol>
+
+  <ol id="my-stories" class="hidden stories-list"></ol>
 
 </section>
 
